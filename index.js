@@ -18,6 +18,7 @@ Object.keys(formProperties).forEach((key) => {
   form.append(key, formProperties[key]);
 });
 
+const listingBaseUrl = 'https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?#listing=';
 const apiUrl = 'https://www.cargurus.com/Cars/inventorylisting/ajaxFetchSubsetInventoryListing.action?sourceContext=carGurusHomePageModel';
 const apiOptions = {
   credentials: 'include',
@@ -27,7 +28,56 @@ const apiOptions = {
   mode: 'cors'
 };
 
+function formatListing(listing) {
+  const {
+    id,
+    mainPictureUrl: pictureUrl,
+    price,
+    mileageString: mileage,
+    priceString,
+    serviceProviderName: dealer,
+    sellerCity: dealerCity,
+    hasAccidents,
+    frameDamaged,
+    carYear: year,
+    vehicleIdentifier: vin,
+    ownerCount,
+    daysOnMarket: daysListed,
+    savingsRecommendation: recommendation,
+  } = listing;
+
+  return {
+    url: listingBaseUrl + id,
+    pictureUrl,
+    price,
+    priceString,
+    mileage,
+    dealer: {
+      name: dealer || 'N/A',
+      city: dealerCity,
+      isPrivateSeller: !Boolean(dealer),
+    },
+    hasAccidents: hasAccidents || frameDamaged,
+    year,
+    vin,
+    daysListed,
+    recommendation
+  }
+}
+
 fetch(apiUrl, apiOptions)
   .then(d => d.json())
-  .then(data => console.log('DATA:', data.listings[0], data.listings && data.listings.length, Object.keys(data)))
+  .then((data) => {
+    const listings = data.listings && data.listings.filter(listing => (
+      listing.transmission === 'M' &&
+      !listing.noPhotos
+    )).map(formatListing);
+
+    if (data.alternateSearch || !listings || listings.length === 0) {
+      console.log('no listings found...');
+      return;
+    }
+
+    console.log('DATA:', listings)
+  })
   .catch(error => console.log('ERROR:', error));
