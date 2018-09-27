@@ -1,13 +1,26 @@
 {
-  "name": "cargurus",
+  "name": "cargurus-listings-fetcher",
   "version": "0.0.1",
-  "description": "fetch specific cars from cargurus",
+  "description": "Fetch listings from cargurus.com for a particular make/model",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Roilan/cargurus-listings-fetcher"
+  },
+  "keywords": [
+    "cargurus",
+    "cargurus api",
+    "cargurus fetch"
+  ],
+  "author": "Roilan <roilan14@gmail.com>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Roilan/cargurus-listings-fetcher/issues"
+  },
+  "homepage": "https://github.com/Roilan/cargurus-listings-fetcher",
   "dependencies": {
     "form-data": "^2.3.2",
     "node-fetch": "^2.2.0"
