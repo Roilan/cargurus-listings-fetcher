@@ -3,7 +3,7 @@ const FormData = require('form-data');
 const fs = require('fs');
 const { promisify } = require('util');
 
-const { zip, distance, carCode } = process.env;
+const { zip, distance, carCode, transmission } = process.env;
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const listingBaseUrl = 'https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?#listing=';
@@ -11,7 +11,12 @@ const apiUrl = 'https://www.cargurus.com/Cars/inventorylisting/ajaxFetchSubsetIn
 const fileName = 'saved-listings.json';
 
 if (!zip || !distance || !carCode) {
-  console.error('missing required variable...');
+  console.error('Missing required variable(s). `zip`, `distance`, and `carCode` is required');
+  process.exit(1);
+}
+
+if (transmission && !['M', 'A'].includes(transmission)) {
+  console.error('Invalid transmission code. `M` for manual or `A` automatic is required.');
   process.exit(1);
 }
 
@@ -50,6 +55,7 @@ function formatListing(listing) {
     ownerCount,
     daysOnMarket: daysListed,
     savingsRecommendation: recommendation,
+    transmission,
   } = listing;
 
   return {
@@ -67,44 +73,26 @@ function formatListing(listing) {
     year,
     vin,
     daysListed,
-    recommendation
-  }
+    recommendation,
+    transmission,
+  };
 }
 
 fetch(apiUrl, apiOptions)
   .then(d => d.json())
   .then(async (data) => {
-    const listings = data.listings && data.listings.filter(listing => (
-      listing.transmission === 'M' &&
-      !listing.noPhotos
-    )).map(formatListing);
+    const listings = data.listings && data.listings.filter((listing) => {
+      if (transmission) {
+        return listing.transmission === transmission;
+      }
+
+      return true;
+    }).map(formatListing);
 
     if (data.alternateSearch || !listings || listings.length === 0) {
       console.log('no listings found...');
-      return;
+      return [];
     }
 
-    let listingsInFile;
-
-    try {
-      listingsInFile = await readFile(fileName, 'utf8');
-      listingsInFile = JSON.parse(listingsInFile);
-    } catch (e) {
-      console.log('no file found...');
-    }
-
-
-    // compare/format data here and return data to save
-    // console.log('DATA:', listings)
-    // console.log('DATA FILE:::', listingsInFile);
-
-    return [
-      {
-        zip,
-        lastUpdated: Date.now(),
-        listings
-      }
-    ];
+    return listings;
   })
-  .then(data => writeFile(fileName, JSON.stringify(data)))
-  .catch(error => console.log('ERROR:', error));
