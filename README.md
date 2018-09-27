@@ -1,13 +1,15 @@
-# [wip] cargurus listings fetcher
+# cargurus listings fetcher
 
 This is a tool to fetch all the listings from cargurus.com for a particular car make/model (`selectedEntity/carCode`) by zip code and distance from that zip code. It's mainly to solve the problem of not knowing when a listing is posted and having to manually scan through every so often.
 
 **Note:** `selectedEntity` seems to be an internal id for cargurus. The only id (in example below) I have currently is for an Mitsubishi Evo X.
 
 ## How to run it / Example
-You can run it with the following node command. It uses env variables for the zip, distance (in miles) and carCode (or selectedEntity).
+You can run it with the following node command. It uses env variables for the zip, distance (in miles), carCode (or selectedEntity), transmission (A or M, optional).
 
 `zip=10001 distance=100 carCode=d423 node example.js`
+`zip=10001 distance=100 carCode=d423 transmission=M node example.js`
+`zip=10001 distance=100 carCode=d423 transmission=A node example.js`
 
 ## Cargurus API body
 
