@@ -1,14 +1,9 @@
 const fetch = require('node-fetch');
 const FormData = require('form-data');
-const fs = require('fs');
-const { promisify } = require('util');
 
 const { zip, distance, carCode, transmission } = process.env;
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
 const listingBaseUrl = 'https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?#listing=';
 const apiUrl = 'https://www.cargurus.com/Cars/inventorylisting/ajaxFetchSubsetInventoryListing.action?sourceContext=carGurusHomePageModel';
-const fileName = 'saved-listings.json';
 
 if (!zip || !distance || !carCode) {
   console.error('Missing required variable(s). `zip`, `distance`, and `carCode` is required');
