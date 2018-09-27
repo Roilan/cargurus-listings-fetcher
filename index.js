@@ -1,6 +1,14 @@
 const fetch = require('node-fetch');
 const FormData = require('form-data');
+const fs = require('fs');
+const { promisify } = require('util');
+
 const { zip, distance, carCode } = process.env;
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const listingBaseUrl = 'https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?#listing=';
+const apiUrl = 'https://www.cargurus.com/Cars/inventorylisting/ajaxFetchSubsetInventoryListing.action?sourceContext=carGurusHomePageModel';
+const fileName = 'saved-listings.json';
 
 if (!zip || !distance || !carCode) {
   console.error('missing required variable...');
@@ -18,8 +26,6 @@ Object.keys(formProperties).forEach((key) => {
   form.append(key, formProperties[key]);
 });
 
-const listingBaseUrl = 'https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?#listing=';
-const apiUrl = 'https://www.cargurus.com/Cars/inventorylisting/ajaxFetchSubsetInventoryListing.action?sourceContext=carGurusHomePageModel';
 const apiOptions = {
   credentials: 'include',
   headers: {},
@@ -67,7 +73,7 @@ function formatListing(listing) {
 
 fetch(apiUrl, apiOptions)
   .then(d => d.json())
-  .then((data) => {
+  .then(async (data) => {
     const listings = data.listings && data.listings.filter(listing => (
       listing.transmission === 'M' &&
       !listing.noPhotos
@@ -78,6 +84,27 @@ fetch(apiUrl, apiOptions)
       return;
     }
 
-    console.log('DATA:', listings)
+    let listingsInFile;
+
+    try {
+      listingsInFile = await readFile(fileName, 'utf8');
+      listingsInFile = JSON.parse(listingsInFile);
+    } catch (e) {
+      console.log('no file found...');
+    }
+
+
+    // compare/format data here and return data to save
+    // console.log('DATA:', listings)
+    // console.log('DATA FILE:::', listingsInFile);
+
+    return [
+      {
+        zip,
+        lastUpdated: Date.now(),
+        listings
+      }
+    ];
   })
+  .then(data => writeFile(fileName, JSON.stringify(data)))
   .catch(error => console.log('ERROR:', error));
