@@ -7,7 +7,7 @@ This is a tool to fetch all the listings from cargurus.com for a particular car 
 ## How to run it / Example
 You can run it with the following node command. It uses env variables for the zip, distance (in miles) and carCode (or selectedEntity).
 
-`zip=10001 distance=100 carCode=d423 node index.js`
+`zip=10001 distance=100 carCode=d423 node example.js`
 
 ## Cargurus API body
 

@@ -78,7 +78,7 @@ function formatListing(listing) {
   };
 }
 
-fetch(apiUrl, apiOptions)
+const fetchListings = () => fetch(apiUrl, apiOptions)
   .then(d => d.json())
   .then(async (data) => {
     const listings = data.listings && data.listings.filter((listing) => {
@@ -95,4 +95,6 @@ fetch(apiUrl, apiOptions)
     }
 
     return listings;
-  })
+  });
+
+module.exports = fetchListings;
