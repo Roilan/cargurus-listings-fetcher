@@ -1,6 +1,6 @@
 {
   "name": "cargurus-listings-fetcher",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Fetch listings from cargurus.com for a particular make/model",
   "main": "index.js",
   "scripts": {
