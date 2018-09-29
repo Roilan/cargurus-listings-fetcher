@@ -10,11 +10,6 @@ if (!zip || !distance || !carCode) {
   process.exit(1);
 }
 
-if (transmission && !['M', 'A'].includes(transmission)) {
-  console.error('Invalid transmission code. `M` for manual or `A` automatic is required.');
-  process.exit(1);
-}
-
 const form = new FormData();
 const formProperties = {
   zip,
@@ -54,6 +49,7 @@ function formatListing(listing) {
   } = listing;
 
   return {
+    id,
     url: listingBaseUrl + id,
     pictureUrl,
     price,
@@ -77,7 +73,7 @@ const fetchListings = () => fetch(apiUrl, apiOptions)
   .then(d => d.json())
   .then(async (data) => {
     const listings = data.listings && data.listings.filter((listing) => {
-      if (transmission) {
+      if (transmission === 'M' || transmission === 'A') {
         return listing.transmission === transmission;
       }
 
